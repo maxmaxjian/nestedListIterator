@@ -5,6 +5,7 @@
 
 using std::vector;
 using std::stack;
+using std::pair;
 
 class NestedInteger {
 public:
@@ -116,24 +117,23 @@ public:
       if (curr.first != curr.second) {
 	if (curr.first->isInteger()) {
 	  result = curr.first->getInteger();
-	  ++curr.first;
-	  iters.push(curr);
+	  ++(curr.first);
+	  if (curr.first != curr.second)
+	    iters.push(curr);
 	}
 	else {
 	  NestedIterator it(curr.first->getList());
-	  iters.push(it.iters.top());
-	  auto temp = iters.top();
-	  iters.pop();
-	  result = *(temp.first);
-	  temp.first++;
-	  iters.push(temp);
-	}
-      }
-      else {
-	iters.pop();
-	if (!iters.empty()) {
-	  auto curr = iters.top();
-	  
+	  result = it.next();
+	  stack<pair<vector<NestedInteger>::const_iterator, vector<NestedInteger>::const_iterator>> temp;
+	  while (!it.iters.empty()) {
+	    temp.push(it.iters.top());
+	    it.iters.pop();
+	  }
+
+	  while (!temp.empty()) {
+	    iters.push(temp.top());
+	    temp.pop();
+	  }
 	}
       }
     }
